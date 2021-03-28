@@ -1,60 +1,49 @@
-# template-for-proposals
+# Freeze ArrayBuffer and Readonly view to ArrayBuffer
 
-A repository template for ECMAScript proposals.
+## Motivation
 
-## Before creating a proposal
+TBD. Performance & security. Maybe intergrate with Record & Tuple?
 
-Please ensure the following:
-  1. You have read the [process document](https://tc39.github.io/process-document/)
-  1. You have reviewed the [existing proposals](https://github.com/tc39/proposals/)
-  1. You are aware that your proposal requires being a member of TC39, or locating a TC39 delegate to "champion" your proposal
+## Freeze ArrayBuffer
 
-## Create your proposal repo
+Add a `ArrayBuffer.prototype.freeze()` to freeze any future modification on the ArrayBuffer. Any view to the ArrayBuffer becomes readonly.
 
-Follow these steps:
-  1.  Click the green ["use this template"](https://github.com/tc39/template-for-proposals/generate) button in the repo header. (Note: Do not fork this repo in GitHub's web interface, as that will later prevent transfer into the TC39 organization)
-  1.  Go to your repo settings “Options” page, under “GitHub Pages”, and set the source to the **main branch** under the root (and click Save, if it does not autosave this setting)
-      1. check "Enforce HTTPS"
-      1. On "Options", under "Features", Ensure "Issues" is checked, and disable "Wiki", and "Projects" (unless you intend to use Projects)
-      1. Under "Merge button", check "automatically delete head branches"
-<!--
-  1.  Avoid merge conflicts with build process output files by running:
-      ```sh
-      git config --local --add merge.output.driver true
-      git config --local --add merge.output.driver true
-      ```
-  1.  Add a post-rewrite git hook to auto-rebuild the output on every commit:
-      ```sh
-      cp hooks/post-rewrite .git/hooks/post-rewrite
-      chmod +x .git/hooks/post-rewrite
-      ```
--->
-  3.  ["How to write a good explainer"][explainer] explains how to make a good first impression.
+### Example
 
-      > Each TC39 proposal should have a `README.md` file which explains the purpose
-      > of the proposal and its shape at a high level.
-      >
-      > ...
-      >
-      > The rest of this page can be used as a template ...
+```js
+const buffer = new ArrayBuffer(8);
+const view = new Int32Array(buffer);
 
-      Your explainer can point readers to the `index.html` generated from `spec.emu`
-      via markdown like
+view[0] = 42 // OK
+buffer.freeze();
 
-      ```markdown
-      You can browse the [ecmarkup output](https://ACCOUNT.github.io/PROJECT/)
-      or browse the [source](https://github.com/ACCOUNT/PROJECT/blob/HEAD/spec.emu).
-      ```
+view[0] = 42 // TypeError
+```
 
-      where *ACCOUNT* and *PROJECT* are the first two path elements in your project's Github URL.
-      For example, for github.com/**tc39**/**template-for-proposals**, *ACCOUNT* is "tc39"
-      and *PROJECT* is "template-for-proposals".
+## Readonly view to ArrayBuffer
 
+Add a new option to the `TypedArray` and `DataView` constructor (or `.prototype.freeze()`). To create a readonly view.
 
-## Maintain your proposal repo
+Note: Readonly view can points to a mutable ArrayBuffer.
 
-  1. Make your changes to `spec.emu` (ecmarkup uses HTML syntax, but is not HTML, so I strongly suggest not naming it ".html")
-  1. Any commit that makes meaningful changes to the spec, should run `npm run build` and commit the resulting output.
-  1. Whenever you update `ecmarkup`, run `npm run build` and commit any changes that come from that dependency.
+To avoid re-create mutable view of the ArrayBuffer via `typedArray.buffer`, it will be special handled.
 
-  [explainer]: https://github.com/tc39/how-we-work/blob/HEAD/explainer.md
+Replace `[[ViewedArrayBuffer]]` with a new ArrayBuffer but points to the same `[[ArrayBufferData]]` ``[[ArrayBufferByteLength]]`` and ``[[ArrayBufferDetachKey]]``. (Need to be careful when any of the internal slot has modified (detached or resized)).
+
+### Example
+
+```js
+const buffer = new ArrayBuffer(8);
+// or roView.freeze()
+const roView = new Int32Array(buffer, { readonly: true });
+const rwView = new Int32Array(buffer);
+
+roView[0] = 42 // TypeError
+rwView[0] = 42 // OK
+
+const tryEscape = roView.buffer
+const newView = new Int32Array(tryEscape)
+newView[0] = 42 // still TypeError
+
+roView.buffer !== rwView
+```
