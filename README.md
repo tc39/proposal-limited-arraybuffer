@@ -2,41 +2,65 @@
 
 ## Motivation
 
-TBD. Performance & security. Maybe intergrate with Record & Tuple?
+### Security
 
-## Freeze ArrayBuffer
+We can have frozen objects (via `Object.freeze`) but not for binary data today.
 
-Add a `ArrayBuffer.prototype.freeze()` to freeze any future modification on the ArrayBuffer. Any view to the ArrayBuffer becomes readonly.
+### Performance
 
-### Example
+-   Developers might copy the whole ArrayBuffer if they want to prevent external code to modify that ArrayBuffer. The copy brings the performance lost.
+-   Engines can safely share the memory across different Realms/processes if the ArrayBuffer is read-only.
+
+## Target
+
+1. Add a new way to freeze the ArrayBuffer.
+    1. One-way. Once it froze, there is no way back.
+    2. All views to the frozen ArrayBuffer are read-only too.
+    3. If it is sent across Realms/processes, it is still frozen.
+2. Add a new way to create a read-only view to a read-write ArrayBuffer.
+    1. Cannot construct the read-write view from `readOnlyView.buffer`
+
+## Possible API design
+
+### Freeze ArrayBuffer
 
 ```js
-const buffer = new ArrayBuffer(8);
-const view = new Int32Array(buffer);
+const buffer = new ArrayBuffer(8)
+const view = new Int32Array(buffer)
 
 view[0] = 42 // OK
-buffer.freeze();
+buffer.freeze()
 
 view[0] = 42 // TypeError
 ```
 
-## Readonly view to ArrayBuffer
+### Readonly view to ArrayBuffer
 
-Add a new option to the `TypedArray` and `DataView` constructor (or `.prototype.freeze()`). To create a readonly view.
-
-Note: Readonly view can points to a mutable ArrayBuffer.
-
-To avoid re-create mutable view of the ArrayBuffer via `typedArray.buffer`, it will be special handled.
-
-Replace `[[ViewedArrayBuffer]]` with a new ArrayBuffer but points to the same `[[ArrayBufferData]]` ``[[ArrayBufferByteLength]]`` and ``[[ArrayBufferDetachKey]]``. (Need to be careful when any of the internal slot has modified (detached or resized)).
-
-### Example
+<!-- Replace `[[ViewedArrayBuffer]]` with a new ArrayBuffer but points to the same `[[ArrayBufferData]]` ``[[ArrayBufferByteLength]]`` and ``[[ArrayBufferDetachKey]]``. (Need to be careful when any of the internal slot has modified (detached or resized)). -->
 
 ```js
-const buffer = new ArrayBuffer(8);
-// or roView.freeze()
-const roView = new Int32Array(buffer, { readonly: true });
-const rwView = new Int32Array(buffer);
+const buffer = new ArrayBuffer(8)
+
+// This one?
+function createROInt32Array(buffer) {
+    return new Int32Array(buffer, { readonly: true })
+}
+// This one?
+function createROInt32Array(buffer) {
+    const view = new Int32Array(buffer)
+    view.freeze()
+    return view
+}
+// Or this one?
+function createROInt32Array(buffer) {
+    const view = new Int32Array(buffer.frozenView)
+    // view.buffer === buffer.frozenView
+    // view.buffer.buffer === view.buffer
+    return view
+}
+
+const roView = createROInt32Array(buffer)
+const rwView = new Int32Array(buffer)
 
 roView[0] = 42 // TypeError
 rwView[0] = 42 // OK
@@ -46,4 +70,17 @@ const newView = new Int32Array(tryEscape)
 newView[0] = 42 // still TypeError
 
 roView.buffer !== rwView
+```
+
+## Integrate with Tuple & Records?
+
+```js
+const buffer = new ArrayBuffer(8)
+fillBuffer(buffer)
+buffer.freeze()
+
+const data = #{
+    binary: buffer
+    // yay!
+}
 ```
