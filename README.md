@@ -26,6 +26,17 @@ We can have frozen objects (via `Object.freeze`) but not for binary data today.
 
 ## Possible API design
 
+```js
+// Mutate this, not copy&return a new one.
+ArrayBuffer.prototype.freeze(): ArrayBuffer
+ArrayBuffer.prototype.isFrozen(): boolean
+
+// One of the following:
+new TypedArray(buffer, { readonly: true })
+new TypedArray(arrayBuffer.frozenView)
+TypedArray.prototype.freeze(), TypedArray.prototype.isFrozen()
+```
+
 ### Freeze ArrayBuffer
 
 ```js
@@ -36,11 +47,10 @@ view[0] = 42 // OK
 buffer.freeze()
 
 view[0] = 42 // TypeError
+buffer.isFrozen() // true
 ```
 
 ### Readonly view to ArrayBuffer
-
-<!-- Replace `[[ViewedArrayBuffer]]` with a new ArrayBuffer but points to the same `[[ArrayBufferData]]` ``[[ArrayBufferByteLength]]`` and ``[[ArrayBufferDetachKey]]``. (Need to be careful when any of the internal slot has modified (detached or resized)). -->
 
 ```js
 const buffer = new ArrayBuffer(8)
