@@ -1,6 +1,16 @@
 # Freeze ArrayBuffer and Readonly view to ArrayBuffer
 
-Slides:
+## Status
+
+Champion(s): *[Jack Works](https://github.com/Jack-Works)*
+
+Author(s): *Jack Works*
+
+Stage: 0
+
+Related proposal: [Fixed view of ArrayBuffer](https://github.com/Jack-Works/proposal-arraybuffer-fixed-view)
+
+## Presentations
 
 - [For stage 1 on 2021/04](https://docs.google.com/presentation/d/1TGLvflOG63C5iHush597ffKTenoYowc3MivQEhAM20w/edit?usp=sharing)
 
@@ -27,7 +37,7 @@ We can have frozen objects (via `Object.freeze`) but not for binary data today.
 ## Possible API design
 
 ```js
-// Mutate this, not copy&return a new one.
+// Mutate this, not copy & return a new one.
 ArrayBuffer.prototype.freeze(): ArrayBuffer
 ArrayBuffer.prototype.isFrozen(): boolean
 
