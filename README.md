@@ -41,4 +41,4 @@ All of the following are helpful to archive the minimal permission/information p
 
 TBD.
 
-Need re-design to integrate with [read-only collections proposal](https://github.com/tc39/proposal-read-only-collections).
+Need re-design to integrate with [read-only collections proposal](https://github.com/tc39/proposal-readonly-collections).
