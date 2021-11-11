@@ -28,7 +28,7 @@ All of the following are helpful to archive the minimal permission/information p
     3. [Optional] Keep frozen when sent across Realm (HTML intergration).
 2. Read-only `TypedArray`/`DataView` to a read-write `ArrayBuffer`.
     1. Must not be able to construct a read-write view from a read-only view.
-3. [Optional] Range-limited `TypedArray`/`DataView` to a read-write `ArrayBuffer` ([CrimsonCodes0](https://github.com/CrimsonCodes0)'s [use case on WebAssembly](https://github.com/Jack-Works/proposal-limited-arraybuffer/issues/11)).
+3. [Optional] Range-limited `TypedArray`/`DataView` to a read-write `ArrayBuffer` ([CrimsonCodes0](https://github.com/CrimsonCodes0)'s [use case on WebAssembly](https://github.com/tc39/proposal-limited-arraybuffer/issues/11)).
     1. Must not be able to construct a bigger view range from a smaller view range.
 4. Not adding too much complexity to the implementor.
 
