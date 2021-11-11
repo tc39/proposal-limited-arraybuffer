@@ -11,6 +11,7 @@ Stage: 1
 ## Presentations
 
 - [For stage 1 on 82th tc39 meeting (Apr 2021)](https://docs.google.com/presentation/d/1TGLvflOG63C5iHush597ffKTenoYowc3MivQEhAM20w/edit?usp=sharing)
+- [TC39 meeting notes on 82th tc39 meeting](https://github.com/tc39/notes/blob/master/meetings/2021-04/apr-21.md#read-only-arraybuffer-and-fixed-view-of-arraybuffer-for-stage-1)
 
 ## Problem
 
