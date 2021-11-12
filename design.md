@@ -110,10 +110,6 @@ readonlyU8Array.buffer.diverge()
 // Throw: Cannot read property snapshot of undefined
 ```
 
-## Why not have `diverge` and `snapshot` on %TypedArray%?
-
-It's ambiguous on the semantics.
-
 ## Why not have `readonlyView` on `ArrayBuffer`?
 
 `ArrayBuffer` itself is not a view to a collection. It needs to be viewed with `TypedArray` or `DataView`.
