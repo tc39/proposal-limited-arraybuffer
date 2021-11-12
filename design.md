@@ -71,7 +71,7 @@ Note: It provides a read-only view to a possibly mutable **ArrayBuffer**.
 4. `[[DefineOwnProperty]]`: Throw.
 5. `[[Set]]`: Throw.
 6. `[[Delete]]`: Throw.
-7. get `%TypedArray%.prototype.buffer`: Return undefine or throw.
+7. get `%TypedArray%.prototype.buffer`: Return undefine or throw. (If we have `ArrayBufferSlice`, return a new slice that is read-only).
 8. Any new `%TypedArray%` created based on this one is also read-only.
 
 # DataView.prototype.readOnlyView()
@@ -85,12 +85,30 @@ This API design is trying to match the
 
 Clone a new read-only `ArrayBuffer`. If the current `ArrayBuffer` is already read-only, it will return itself.
 
+# %TypedArray%.prototype.snapshot()
+
+This API is required if we do not have `ArrayBufferSlice` because `%TypedArray%.prototype.buffer` will return undefined/throw therefore it's impossible to create a snaphost on a read-only typed array view.
+
+```js
+readonlyU8Array.buffer.snapshot()
+// Throw: Cannot read property snapshot of undefined
+```
+
 # ArrayBuffer.prototype.diverge()
 
 This API design is trying to match the
 [Readonly collection proposal](https://github.com/tc39/proposal-readonly-collections#snapshotdivergereadonlyview-methods-for-all-collections).
 
 Clone a new mutable `ArrayBuffer` (even if the current `ArrayBuffer` is read-only).
+
+# %TypedArray%.prototype.diverge()
+
+This API is required if we do not have `ArrayBufferSlice` because `%TypedArray%.prototype.buffer` will return undefined/throw therefore it's impossible to create a diverge on a read-only typed array view.
+
+```js
+readonlyU8Array.buffer.diverge()
+// Throw: Cannot read property snapshot of undefined
+```
 
 ## Why not have `diverge` and `snapshot` on %TypedArray%?
 
@@ -114,8 +132,8 @@ This part is intended to resolve the use case of [issue #11](https://github.com/
 
 > One wants the slice to be read-only in order to prevent writing to the memory, and one doesn't want to move around the entire ArrayBuffer object, as that would allow reading into the memory at practically arbitrary locations.
 
-⚠ This will massively increase the complexity of the implementation.
-
+1. Can be created by `ArrayBuffer.prototype.slice(offset, length)`
+1. Calling `.freeze()` on an `ArrayBufferSlice` will throw.
 1. `%TypedArray%`, `DataView` and host APIs can also accept `ArrayBufferSlice` when `ArrayBuffer` is accepted.
-2. Cannot get the wider view based on the `ArrayBufferSlice`.
-3. Can create a read-only slice and keep the underlying `ArrayBuffer` mutable.
+1. Cannot get the wider view based on the `ArrayBufferSlice`.
+1. Can create a read-only slice and keep the underlying `ArrayBuffer` mutable.
