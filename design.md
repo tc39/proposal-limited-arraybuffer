@@ -128,7 +128,7 @@ This part is intended to resolve the use case of [issue #11](https://github.com/
 
 > One wants the slice to be read-only in order to prevent writing to the memory, and one doesn't want to move around the entire ArrayBuffer object, as that would allow reading into the memory at practically arbitrary locations.
 
-1. Can be created by `ArrayBuffer.prototype.slice(offset, length)`
+1. Can be created by `ArrayBuffer.prototype.placeholder_name_to_create_a_new_slice(offset, length)`
 1. Calling `.freeze()` on an `ArrayBufferSlice` will throw.
 1. `%TypedArray%`, `DataView` and host APIs can also accept `ArrayBufferSlice` when `ArrayBuffer` is accepted.
 1. Cannot get the wider view based on the `ArrayBufferSlice`.
