@@ -13,7 +13,7 @@ Stage: 1
 - [For stage 1 on 82th tc39 meeting (Apr 2021)](https://docs.google.com/presentation/d/1TGLvflOG63C5iHush597ffKTenoYowc3MivQEhAM20w/edit?usp=sharing)
 - [TC39 meeting notes on 82th tc39 meeting](https://github.com/tc39/notes/blob/master/meetings/2021-04/apr-21.md#read-only-arraybuffer-and-fixed-view-of-arraybuffer-for-stage-1)
 
-## Problem
+## Problem to be resolved
 
 All of the following are helpful to archive the minimal permission/information principle.
 
@@ -38,8 +38,6 @@ All of the following are helpful to archive the minimal permission/information p
 1. Minimal permission/information principle works on `ArrayBuffer`.
 2. Embedded JS engines can represent ROMs as read-only `ArrayBuffer`.
 
-## Possible API design
+## API design
 
-TBD.
-
-Need re-design to integrate with [read-only collections proposal](https://github.com/tc39/proposal-readonly-collections).
+See [design.md](./design.md)
